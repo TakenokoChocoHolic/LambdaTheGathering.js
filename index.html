@@ -28,14 +28,27 @@
 <script>
 	// ---------------------------------- Dummy
 	var Game = {};
-	Game.State = function(){}
-	Game.step  = function(){ alert(JSON.stringify(arguments)); }
+	Game.NUM_SLOT = 256;
+	Game.Id = function(x) { return x; };
+	Game.State = function(){
+		this.player = [];
+		for (var i = 0; i < 2; i++) {
+			var slot = [];
+			for (var i = 0; i < Game.NUM_SLOT; i++) {
+				slot.push({ vitality: 255, value : Game.Id });
+			}
+			var player = {'slot' : slot};
+			this.player.push(player);
+		}
+		this.turn = 1;
+	}
+
+	Game.step  = function(slot_num, card, dir, state){ alert(JSON.stringify(arguments)); return state;}
 	// ---------------------------------- Dummy
 
 $(function(){
 	'use strict';
 
-	var NUM_SLOT = 256
 	var state = new Game.State();
 
 	// Init Slot
@@ -54,7 +67,7 @@ $(function(){
 		}
 	}
 	var dataNumberAttribute = 'slot-number';
-	for (var i = 0; i < NUM_SLOT; i++) {
+	for (var i = 0; i < Game.NUM_SLOT; i++) {
 		var slot = $('<div class="slot" />');
 		slot.data(dataNumberAttribute, i);
 		slot.click(check(slot));
@@ -71,9 +84,15 @@ $(function(){
 	]
 	function mkCmd(dir, card) {
 		return function() {
-			var slot = parseInt($('.' + checkedClass).first().data(dataNumberAttribute));
-			if (slot) {
-				Game.step(slot, card, dir, state);
+			var slot_num = parseInt($('.' + checkedClass).first().data(dataNumberAttribute));
+			if (slot_num) {
+				state = Game.step(slot_num, card, dir, state);
+				// update view
+				$('.slot').each(function () {
+					var idx = $(this).data(dataNumberAttribute);
+					var vit = state.player[0].slot[idx].vitality;
+					$(this).text(vit);
+				});
 			} else {
 				alert('!!! Select slot !!!');
 			}
