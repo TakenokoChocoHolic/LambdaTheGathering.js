@@ -4,122 +4,91 @@ var Game = {};
     root.state = null;
     root.depth = 0;
 
+    var args_to_array = function (args) {
+        var len, array, i;
+
+        len = args.length;
+        array = [];
+        for (i=0; i<len; i++) array[i] = args[i];
+
+        return array;
+    };
+
+    var make_curry = function (func) {
+        var required_length = func.length;
+        var curried_func = function () {
+            var ret;
+            var args = args_to_array(arguments);
+
+            if (args.length >= required_length) {
+                ret = func.apply(null, args.slice(0, required_length));
+                if (typeof ret === 'function') {
+                    ret = make_curry(ret).apply(null, args.slice(required_length));
+                }
+            } else {
+                ret = function () {
+                    var adds = args_to_array(arguments);
+                    return curried_func.apply(null, args.concat(adds));
+                };
+            }
+            return ret;
+        };
+        return curried_func;
+    };
+
+    var wrapper = function (func) {
+        return function () {
+            root.depth++;
+            return make_curry(func).apply(null, arguments);
+        };
+    };
+
     var zero = function () {
-        root.depth++;
         return 0;
     };
 
     var succ = function (n) {
-        root.depth++;
         return n + 1;
     };
 
     var dbl = function (n) {
-        root.depth++;
         return n * 2;
     };
 
     var get = function (i) {
-        root.depth++;
         return i;
     };
 
     var put = function () {
-        root.depth++;
         return I;
     };
 
     var I = function (x) {
-        root.depth++;
         return x;
     };
 
     var K = function (x, y) {
-        root.depth++;
-        var KK = function () {
-            root.depth++;
-            return x;
-        };
-        if (typeof y === "undefined") {
-            return KK;
-        } else {
-            return x;
-        }
+        return x;
     };
 
     var S = function (f, g, x) {
-        root.depth++;
-        if (typeof g === "undefined") {
-            return function (gg, xx) {
-                var ff = f;
-                root.depth++;
-
-                if (typeof xx === "undefined") {
-                    return function (xxx) {
-                        var fff = ff,
-                            ggg = gg;
-
-                        root.depth++;
-                        return fff(xxx)(ggg(xxx));
-                    };
-                } else {
-                    return ff(xx)(gg(xx));
-                }
-            };
-        } else if (typeof x === "undefined") {
-            return function (xx) {
-                var ff = f,
-                    gg = g;
-
-                root.depth++;
-                return ff(xx)(gg(xx));
-            };
-        } else {
-            return f(x)(g(x));
-        }
+        return f(x)(f(x));
     };
 
     var inc = function (i) {
-        root.depth++;
         return i;
     };
 
     var dec = function (i) {
-        root.depth++;
         return i;
     };
 
     var attack = function (i, j, n) {
-        var _attack = function (jj, nn) {
-            var ii = i;
-            var __attack = function (nnn) {
-                var iii = ii,
-                    jjj = jj;
-
-                root.depth++;
-                // TODO: error check
-                var proponent = root.state.player[root.state.turn%2];
-                var opponent = root.state.player[1-root.state.turn%2];
-                proponent.slot[iii].vitality    -= nnn;
-                opponent.slot[255-jjj].vitality -= ~~(nnn * 9 / 10);
-            };
-
-            root.depth++;
-            if (typeof nn === "undefined") {
-                return __attack;
-            } else {
-                return __attack(nn);
-            }
-        };
-
-        root.depth++;
-        if (typeof j === "undefined") {
-            return _attack;
-        } else if (typeof n === "undefined") {
-            return _attack(j);
-        } else {
-            return _attack(j, n);
-        }
+        // TODO: error check
+        var proponent = root.state.player[root.state.turn%2];
+        var opponent = root.state.player[1-root.state.turn%2];
+        proponent.slot[i].vitality    -= n;
+        opponent.slot[255-j].vitality -= ~~(n * 9 / 10);
     };
 
     var step = function (slot_num, func, dir, state) {
@@ -137,18 +106,18 @@ var Game = {};
         }
     };
 
-    root.zero = zero;
-    root.succ = succ;
-    root.dbl = dbl;
-    root.cI = I;
-    root.cK = K;
-    root.cS = S;
-    root.get = get;
-    root.put = put;
-    root.inc = inc;
-    root.dec = dec;
-    root.attack = attack;
-    root.step = step;
+    root.zero   = wrapper(zero);
+    root.succ   = wrapper(succ);
+    root.dbl    = wrapper(dbl);
+    root.cI     = wrapper(I);
+    root.cK     = wrapper(K);
+    root.cS     = wrapper(S);
+    root.get    = wrapper(get);
+    root.put    = wrapper(put);
+    root.inc    = wrapper(inc);
+    root.dec    = wrapper(dec);
+    root.attack = wrapper(attack);
+    root.step   = wrapper(step);
 
 })(Game);
 
