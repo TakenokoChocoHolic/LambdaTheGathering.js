@@ -1,0 +1,94 @@
+<!doctyep html>
+<style>
+	#slots {
+		float: left;
+		width: 320px;
+	}
+	.slot {
+		display: inline-block;
+		background-color: #dfd;
+		border: solid 1px black;
+		width: 18px;
+		height: 18px;
+	}
+	.slot.checked-slot {
+		background-color: #fdd;
+	}
+	#buttons {
+		float: left;
+	}
+</style>
+<title>Lambda the Gathering</title>
+
+<div id="slots"></div>
+<ul id="buttons"></ul>
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js"></script>
+<script src="game.js"></script>
+<script>
+	// ---------------------------------- Dummy
+	var Game = {};
+	Game.State = function(){}
+	Game.step  = function(){ alert(JSON.stringify(arguments)); }
+	// ---------------------------------- Dummy
+
+$(function(){
+	'use strict';
+
+	var NUM_SLOT = 256
+	var state = new Game.State();
+
+	// Init Slot
+	var parent = $('#slots');
+	var checkecId = null;
+	var checkedClass = 'checked-slot';
+	function check(jElem) {
+		var num = parseInt(jElem.data('slot-number'));
+		return function() {
+			if (jElem.hasClass(checkedClass)) {
+				jElem.removeClass(checkedClass);
+			} else {
+				$('.slot').removeClass(checkedClass);
+				jElem.addClass(checkedClass);
+			}
+		}
+	}
+	var dataNumberAttribute = 'slot-number';
+	for (var i = 0; i < NUM_SLOT; i++) {
+		var slot = $('<div class="slot" />');
+		slot.data(dataNumberAttribute, i);
+		slot.click(check(slot));
+		parent.append(slot);
+	}
+
+	// Create buttons
+	var dirs = ['left', 'right'];
+	var cards = [
+		"zero", "succ", "dbl", // numbers
+		'get', 'put',
+		'S', 'K', 'I',
+		'inc', 'dec', 'attack', 'help', 'copy', 'revive', 'zombie'
+	]
+	function mkCmd(dir, card) {
+		return function() {
+			var slot = parseInt($('.' + checkedClass).first().data(dataNumberAttribute));
+			if (slot) {
+				Game.step(slot, card, dir, state);
+			} else {
+				alert('!!! Select slot !!!');
+			}
+		};
+	};
+	parent = $('#buttons');
+	for (var i = 0; i < cards.length; i++) {
+		var card = cards[i];
+		var item = $('<li />').text(card);
+		for (var j = 0; j < dirs.length; j++) {
+			var dir = dirs[j];
+			var btn = $('<button />').text(dir).click(mkCmd(dir, card));
+			item.append(btn);
+		}
+		parent.append(item);
+	}
+});	
+</script>
