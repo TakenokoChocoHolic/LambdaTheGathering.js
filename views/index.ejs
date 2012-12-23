@@ -1,0 +1,59 @@
+<% title = 'Hello, world' %>
+
+<% first_message = "ask your matter!" %>
+<% copyright = "Copyright(C) 2012. Almond Choco Project(仮)" %>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $("#input").keyup(function(event) {
+            if (event.keyCode == 13) {
+                $("#submit").click();
+            }
+        });
+
+        var socket = io.connect('<%= url %>');
+        // receiver
+        socket.on('ls', function (data) {
+            console.log("received: " + "ls, " + data.map);
+            $("#output").val(data.map);
+        });
+        // sender
+        $("#submit").click(function() {
+            cmdText = $("#input").val();
+            if (cmdText.length > 0) {
+                args = cmdText.split(" ");
+                cmd = args.shift();
+                socket.emit(cmd, { args: args });
+                console.log("emitted: " + cmdText);
+            }
+            $("#input").val("");
+        });
+
+        for (var i=0; i<<%= rooms.length %>; i++) {
+            (function () {
+                var index = i;
+                $("#room"+index).click(function () {
+                    // TODO: send by websocket
+                });
+            }());
+        }
+    });
+</script>
+
+<h2><%= msg %></h2>
+
+<ul>
+  <% for (var i=0; i<rooms.length; i++) { %>
+  <li><a href="#" id="room<%= i %>"><%= rooms[i] %></a></li>
+  <% } %>
+</ul>
+
+<p><textarea id="output" rows="10" cols="40">output</textarea></p>
+<p>
+    <input type="text" id="input" rows="1" cols="40"></input>
+    <button id="submit" type="button">Submit</button>
+</p>
+
+<%= copyright %>
