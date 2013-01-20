@@ -58,7 +58,7 @@ describe("Game with state", function() {
         });
     });
 
-    describe("when executing the 1st turn of the 1st exmaple actions in the official site", function() {
+    describe("when executing the 1st turn of the 1st exmaple in the official site", function() {
         it("should have correct slots", function () {
             Game.step(0, Game.zero, false, state);
             Game.step(0, Game.inc, false, state);
@@ -66,6 +66,20 @@ describe("Game with state", function() {
             expect(state.player[0].slot[0].vitality).toEqual(10000);
             expect(state.player[1].slot[0].value).toEqual(Game.inc);
             expect(state.player[1].slot[0].vitality).toEqual(10000);
+            expect(state.turn).toEqual(2);
+        });
+    });
+
+    describe("when executing all the turns of the 1st exmaple in the official site", function() {
+        it("should have correct slots", function () {
+            Game.step(0, Game.zero, false, state);
+            Game.step(0, Game.inc, false, state);
+            Game.step(0, Game.succ, true, state);
+            Game.step(0, Game.zero, false, state);
+            expect(state.player[0].slot[0].value).toEqual(1);
+            expect(state.player[0].slot[0].vitality).toEqual(10000);
+            expect(state.player[1].slot[0].value).toEqual(Game.cI);
+            expect(state.player[1].slot[0].vitality).toEqual(10001);
         });
     });
 });
