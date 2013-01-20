@@ -49,6 +49,12 @@ describe("Game", function () {
             expect(Game.cI(Game.zero)).toEqual(0);
         });
     });
+
+    describe("I(inc)", function () {
+        it("should be equal to inc", function () {
+            expect(Game.cI(Game.inc)).toEqual(Game.inc);
+        });
+    });
 });
 
 describe("Game with state", function() {
