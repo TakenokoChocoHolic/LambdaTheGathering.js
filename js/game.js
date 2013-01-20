@@ -38,6 +38,9 @@ var Game = {};
 
     var wrapper = function (func) {
         return function () {
+            if (root.depth >= 1000) {
+                throw 'number of function applications exceeds 1000';
+            }
             root.depth++;
             return make_curry(func).apply(null, arguments);
         };
@@ -51,23 +54,53 @@ var Game = {};
         return root.state.player[1 - root.state.turn % 2];
     };
 
+    var validate_number = function (i) {
+        if (typeof i !== 'number') {
+            throw 'number is expected, but get ' + i;
+        }
+    };
+
+    var validate_slot_number = function (i) {
+        if (typeof i !== 'number' || i < 0 || 255 < i) {
+            throw 'invalid slot number ' + i;
+        }
+    };
+
     var zero = function () {
         return 0;
     };
 
     var succ = function (n) {
-        return n + 1;
+        validate_number(n);
+
+        if (n < 65535) {
+            return n + 1;
+        } else {
+            if (n !== 65535) {
+                console.log('succ : too large number ' + n);
+            }
+            return 65535;
+        }
     };
 
     var dbl = function (n) {
-        return n * 2;
+        validate_number(n);
+
+        if (n < 32768) {
+            return n * 2;
+        } else {
+            return 65535;
+        }
     };
 
     var get = function (i) {
-        return proponent().slot[i].value;
+        validate_slot_number(i);
+
+        var slot = proponent().slot[i];
+        return slot.value;
     };
 
-    var put = function () {
+    var put = function (x) {
         return I;
     };
 
@@ -84,34 +117,53 @@ var Game = {};
     };
 
     var inc = function (i) {
-        proponent().slot[i].vitality += 1;
+        validate_slot_number(i);
+
+        var slot = proponent().slot[i];
+        if (0 < slot.vitality && slot.vitality < 65535) {
+            slot.vitality += 1;
+        }
         return I;
     };
 
     var dec = function (i) {
-        opponent().slot[255-i].vitality -= 1;
+        validate_slot_number(i);
+
+        var slot = opponent().slot[255-i];
+        if (slot.vitality > 0) {
+            slot.vitality -= 1;
+        }
         return I;
     };
 
     var attack = function (i, j, n) {
-        // TODO: error check
+        validate_slot_number(i);
+        validate_slot_number(j);
+
         proponent().slot[i].vitality    -= n;
-        opponent().slot[255-j].vitality -= ~~(n * 9 / 10);
+        opponent().slot[255-j].vitality -= Math.floor(n * 9 / 10);
         return I;
     };
 
     var help = function (i, j, n) {
+        validate_slot_number(i);
+        validate_slot_number(j);
+
         var prop = proponent();
         prop.slot[i].vitality -= n;
-        prop.slot[j].vitality += ~~(n * 11 / 10);
+        prop.slot[j].vitality += Math.floor(n * 11 / 10);
         return I;
     };
 
     var copy = function (i) {
+        validate_slot_number(i);
+
         return opponent().slot[i].value;
     };
 
     var revive = function (i) {
+        validate_slot_number(i);
+
         var slot = proponent().slot[i];
         if (slot.vitality <= 0) {
             slot.vitality = 1;
@@ -120,12 +172,14 @@ var Game = {};
     };
 
     var zombie = function (i, x) {
+        validate_slot_number(i);
+
         var slot = opponent().slot[i];
         if (slot.vitality <= 0) {
             slot.value = x;
             slot.vitality = -1;
         } else {
-            // TODO: raise error
+            throw 'tried to apply zombie to alive slot';
         }
 
         return I;
