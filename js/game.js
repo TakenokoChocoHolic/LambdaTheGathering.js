@@ -43,6 +43,14 @@ var Game = {};
         };
     };
 
+    var proponent = function () {
+        return root.state.player[root.state.turn % 2];
+    };
+
+    var opponent = function () {
+        return root.state.player[1 - root.state.turn % 2];
+    };
+
     var zero = function () {
         return 0;
     };
@@ -56,7 +64,7 @@ var Game = {};
     };
 
     var get = function (i) {
-        return i;
+        return proponent().slot[i].value;
     };
 
     var put = function () {
@@ -76,19 +84,51 @@ var Game = {};
     };
 
     var inc = function (i) {
-        return i;
+        proponent().slot[i].vitality += 1;
+        return I;
     };
 
     var dec = function (i) {
-        return i;
+        opponent().slot[255-i].vitality -= 1;
+        return I;
     };
 
     var attack = function (i, j, n) {
         // TODO: error check
-        var proponent = root.state.player[root.state.turn%2];
-        var opponent = root.state.player[1-root.state.turn%2];
-        proponent.slot[i].vitality    -= n;
-        opponent.slot[255-j].vitality -= ~~(n * 9 / 10);
+        proponent().slot[i].vitality    -= n;
+        opponent().slot[255-j].vitality -= ~~(n * 9 / 10);
+        return I;
+    };
+
+    var help = function (i, j, n) {
+        var prop = proponent();
+        prop.slot[i].vitality -= n;
+        prop.slot[j].vitality += ~~(n * 11 / 10);
+        return I;
+    };
+
+    var copy = function (i) {
+        return opponent().slot[i].value;
+    };
+
+    var revive = function (i) {
+        var slot = proponent().slot[i];
+        if (slot.vitality <= 0) {
+            slot.vitality = 1;
+        }
+        return I;
+    };
+
+    var zombie = function (i, x) {
+        var slot = opponent().slot[i];
+        if (slot.vitality <= 0) {
+            slot.value = x;
+            slot.vitality = -1;
+        } else {
+            // TODO: raise error
+        }
+
+        return I;
     };
 
     var step = function (slot_num, func, dir, state) {
@@ -117,6 +157,11 @@ var Game = {};
     root.inc    = wrapper(inc);
     root.dec    = wrapper(dec);
     root.attack = wrapper(attack);
+    root.help   = wrapper(help);
+    root.copy   = wrapper(copy);
+    root.revive = wrapper(revive);
+    root.zombie = wrapper(zombie);
+
     root.step   = wrapper(step);
 
 })(Game);
