@@ -20,6 +20,10 @@ var Game = {};
             var ret;
             var args = args2array(arguments);
 
+            if (args.length === 0) {
+                return func;
+            }
+
             if (args.length >= requiredLength) {
                 ret = func.apply(null, args.slice(0, requiredLength));
                 root.depth += requiredLength;
