@@ -45,9 +45,11 @@ $(function(){
 	}
 
 	var checkedIndex = null;
-	renderSlots($('#userA .slots'), state.player[0].slot, function(ix){ checkedIndex = ix; });
-	renderSlots($('#userB .slots'), state.player[1].slot, null);
-
+	var renderBoth = function() {
+		renderSlots($('#userA .slots'), state.player[0].slot, function(ix){ checkedIndex = ix; });
+		renderSlots($('#userB .slots'), state.player[1].slot, null);
+	}
+	renderBoth();
 
 	// Create buttons
 	var dirs = ['left', 'right'];
@@ -60,14 +62,9 @@ $(function(){
 	function mkCmd(dir, card) {
 		return function() {
 			var slotNum = checkedIndex;
-			if (slotNum) {
-				state = Game.step(slotNum, card, dir, state);
-				// update view
-				$('.slot').each(function () {
-					var idx = $(this).data(dataNumberAttribute);
-					var vit = state.player[0].slot[idx].vitality;
-					$(this).text(vit);
-				});
+			if (slotNum !== null) {
+				Game.step(slotNum, card, dir, state);
+				renderBoth();
 			} else {
 				alert('!!! Select slot !!!');
 			}
@@ -92,6 +89,7 @@ $(function(){
 		formElem.submit(function() {
 			var text = formElem.children('textarea').val();
 			eval(text);
+			renderBoth();
 			return false;
 		});
 	});
