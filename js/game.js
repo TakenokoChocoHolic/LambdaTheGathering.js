@@ -22,8 +22,10 @@ var Game = {};
 
             if (args.length >= requiredLength) {
                 ret = func.apply(null, args.slice(0, requiredLength));
+                root.depth += requiredLength;
                 if (typeof ret === 'function') {
                     ret = makeCurry(ret).apply(null, args.slice(requiredLength));
+                    root.depth += args.length - requiredLength;
                 }
             } else {
                 ret = function () {
@@ -41,7 +43,6 @@ var Game = {};
             if (root.depth >= 1000) {
                 throw 'number of function applications exceeds 1000';
             }
-            root.depth++;
             return makeCurry(func).apply(null, arguments);
         };
     };
@@ -66,11 +67,7 @@ var Game = {};
         }
     };
 
-    var zero = function () {
-        return 0;
-    };
-
-    var succ = function (n) {
+    var succ = wrapper(function (n) {
         validateNumber(n);
 
         if (n < 65535) {
@@ -81,9 +78,9 @@ var Game = {};
             }
             return 65535;
         }
-    };
+    });
 
-    var dbl = function (n) {
+    var dbl = wrapper(function (n) {
         validateNumber(n);
 
         if (n < 32768) {
@@ -91,32 +88,32 @@ var Game = {};
         } else {
             return 65535;
         }
-    };
+    });
 
-    var get = function (i) {
+    var get = wrapper(function (i) {
         validateSlotNumber(i);
 
         var slot = proponent().slot[i];
         return slot.value;
-    };
+    });
 
-    var put = function (x) {
+    var put = wrapper(function (x) {
         return I;
-    };
+    });
 
-    var I = function (x) {
+    var I = wrapper(function (x) {
         return x;
-    };
+    });
 
-    var K = function (x, y) {
+    var K = wrapper(function (x, y) {
         return x;
-    };
+    });
 
-    var S = function (f, g, x) {
+    var S = wrapper(function (f, g, x) {
         return f(x)(f(x));
-    };
+    });
 
-    var inc = function (i) {
+    var inc = wrapper(function (i) {
         validateSlotNumber(i);
 
         var slot = proponent().slot[i];
@@ -124,9 +121,9 @@ var Game = {};
             slot.vitality += 1;
         }
         return I;
-    };
+    });
 
-    var dec = function (i) {
+    var dec = wrapper(function (i) {
         validateSlotNumber(i);
 
         var slot = opponent().slot[255-i];
@@ -134,18 +131,18 @@ var Game = {};
             slot.vitality -= 1;
         }
         return I;
-    };
+    });
 
-    var attack = function (i, j, n) {
+    var attack = wrapper(function (i, j, n) {
         validateSlotNumber(i);
         validateSlotNumber(j);
 
         proponent().slot[i].vitality    -= n;
         opponent().slot[255-j].vitality -= Math.floor(n * 9 / 10);
         return I;
-    };
+    });
 
-    var help = function (i, j, n) {
+    var help = wrapper(function (i, j, n) {
         validateSlotNumber(i);
         validateSlotNumber(j);
 
@@ -153,15 +150,15 @@ var Game = {};
         prop.slot[i].vitality -= n;
         prop.slot[j].vitality += Math.floor(n * 11 / 10);
         return I;
-    };
+    });
 
-    var copy = function (i) {
+    var copy = wrapper(function (i) {
         validateSlotNumber(i);
 
         return opponent().slot[i].value;
-    };
+    });
 
-    var revive = function (i) {
+    var revive = wrapper(function (i) {
         validateSlotNumber(i);
 
         var slot = proponent().slot[i];
@@ -169,9 +166,9 @@ var Game = {};
             slot.vitality = 1;
         }
         return I;
-    };
+    });
 
-    var zombie = function (i, x) {
+    var zombie = wrapper(function (i, x) {
         validateSlotNumber(i);
 
         var slot = opponent().slot[i];
@@ -183,7 +180,7 @@ var Game = {};
         }
 
         return I;
-    };
+    });
 
     var applyCard = function (func, arg) {
         var ret;
@@ -242,20 +239,20 @@ var Game = {};
     };
 
     root.zero   = 0;
-    root.succ   = wrapper(succ);
-    root.dbl    = wrapper(dbl);
-    root.cI     = wrapper(I);
-    root.cK     = wrapper(K);
-    root.cS     = wrapper(S);
-    root.get    = wrapper(get);
-    root.put    = wrapper(put);
-    root.inc    = wrapper(inc);
-    root.dec    = wrapper(dec);
-    root.attack = wrapper(attack);
-    root.help   = wrapper(help);
-    root.copy   = wrapper(copy);
-    root.revive = wrapper(revive);
-    root.zombie = wrapper(zombie);
+    root.succ   = succ;
+    root.dbl    = dbl;
+    root.cI     = I;
+    root.cK     = K;
+    root.cS     = S;
+    root.get    = get;
+    root.put    = put;
+    root.inc    = inc;
+    root.dec    = dec;
+    root.attack = attack;
+    root.help   = help;
+    root.copy   = copy;
+    root.revive = revive;
+    root.zombie = zombie;
 
     root.step   = step;
     root.initState = initState;
