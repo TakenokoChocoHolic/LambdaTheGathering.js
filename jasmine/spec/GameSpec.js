@@ -92,10 +92,61 @@ describe("Game with state", function() {
             Game.step(0, Game.inc, false, state);
             Game.step(0, Game.succ, true, state);
             Game.step(0, Game.zero, false, state);
-            expect(state.player[0].slot[0].value).toEqual(1);
-            expect(state.player[0].slot[0].vitality).toEqual(10000);
-            expect(state.player[1].slot[0].value).toEqual(Game.cI);
-            expect(state.player[1].slot[0].vitality).toEqual(10001);
+            expect(state.player[0].slot[0]).toEqual({'value': 1, 'vitality': 10000});
+            expect(state.player[1].slot[0]).toEqual({'value': Game.cI, 'vitality': 10001});
+            Game.step(0, Game.succ, true, state);
+            Game.step(0, Game.dec, false, state);
+            expect(state.player[0].slot[0]).toEqual({'value': 2, 'vitality': 10000});
+            expect(state.player[1].slot[0]).toEqual({'value': Game.dec, 'vitality': 10001});
+            Game.step(0, Game.dbl, true, state);
+            Game.step(0, Game.zero, false, state);
+            expect(state.player[0].slot[0]).toEqual({'value': 4, 'vitality': 10000});
+            expect(state.player[0].slot[255]).toEqual({'value': Game.cI, 'vitality': 9999});
+            expect(state.player[1].slot[0]).toEqual({'value': Game.cI, 'vitality': 10001});
+            Game.step(0, Game.inc, true, state);
+            Game.step(0, Game.succ, true, state);
+            expect(state.player[0].slot[4]).toEqual({'value': Game.cI, 'vitality': 10001});
+            expect(state.player[0].slot[255]).toEqual({'value': Game.cI, 'vitality': 9999});
+            expect(state.turn).toEqual(10);
         });
     });
+
+    describe("when executing all the turns of the 2nd exmaple in the official site", function() {
+        it("should have correct slots", function () {
+            Game.step(0, Game.help, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.zero, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.cK, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.cS, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.succ, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.zero, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(1, Game.zero, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(1, Game.succ, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(1, Game.dbl, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(1, Game.dbl, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(1, Game.dbl, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(1, Game.dbl, true, state); Game.step(0, Game.cI, false, state);
+            expect(state.player[0].slot[1].value).toEqual(16);
+            Game.step(0, Game.cK, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.cS, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.get, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.cK, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.cS, true, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.succ, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.zero, false, state); Game.step(0, Game.cI, false, state);
+            expect(state.turn).toEqual(38);
+            expect(state.player[0].slot[0]).toEqual({'value': Game.cI, 'vitality': 9984});
+            expect(state.player[0].slot[1]).toEqual({'value': 16, 'vitality': 10017});
+        });
+    });
+
+    describe("when executing all the turns of the 3rd exmaple in the official site", function() {
+        it("should have correct slots", function () {
+            Game.step(0, Game.cS, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.get, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.cI, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.zero, false, state); Game.step(0, Game.cI, false, state);
+            expect(state.player[0].slot[0]).toEqual({'value': Game.cI, 'vitality': 10000});
+        });
+    });
+
 });
