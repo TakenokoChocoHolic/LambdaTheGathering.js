@@ -47,12 +47,12 @@ $(function(){
 	var checkedIndex = null;
 	var renderBoth = function() {
 		renderSlots($('#userA .slots'), state.player[0].slot, function(ix){ checkedIndex = ix; });
-		renderSlots($('#userB .slots'), state.player[1].slot, null);
+		renderSlots($('#userB .slots'), state.player[1].slot, function(ix){ checkedIndex = ix; });
 	}
 	renderBoth();
 
 	// Create buttons
-	var dirs = ['left', 'right'];
+	var dirs = ['card(slot)', 'slot(card)'];
 	var cards = {
 		"zero":    Game.zero,
 		"succ":    Game.succ,
@@ -75,7 +75,7 @@ $(function(){
 		return function() {
 			var slotNum = checkedIndex;
 			if (slotNum !== null) {
-				Game.step(slotNum, cardFunc, dir, state);
+				Game.step(slotNum, cardFunc, dir === dirs[0], state);
 				renderBoth();
 			} else {
 				alert('!!! Select slot !!!');
