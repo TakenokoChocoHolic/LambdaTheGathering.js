@@ -59,6 +59,7 @@
 <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js"></script>
 <script src="game.js"></script>
 <script>
+/*
 	// ---------------------------------- Dummy
 	var Game = {};
 	Game.NUM_SLOT = 256;
@@ -78,11 +79,11 @@
 
 	Game.step  = function(slot_num, card, dir, state){ alert(JSON.stringify(arguments)); return state;}
 	// ---------------------------------- Dummy
-
+*/
 $(function(){
 	'use strict';
 
-	var state = new Game.State();
+	var state = Game.initState();
 
 	// Init Slot
 	var checkecId = null;
@@ -118,9 +119,9 @@ $(function(){
 	]
 	function mkCmd(dir, card) {
 		return function() {
-			var slot_num = parseInt($('.' + checkedClass).first().data(dataNumberAttribute));
-			if (slot_num) {
-				state = Game.step(slot_num, card, dir, state);
+			var slotNum = parseInt($('.' + checkedClass).first().data(dataNumberAttribute));
+			if (slotNum) {
+				state = Game.step(slotNum, card, dir, state);
 				// update view
 				$('.slot').each(function () {
 					var idx = $(this).data(dataNumberAttribute);
@@ -144,16 +145,16 @@ $(function(){
 		parent.append(item);
 	}
 
-  // Initialize components for AI programming
-  var users = ['#userA', '#userB'];
-  _.each(users, function(formId) {
-    var formElem = $(formId + ' .cmd');
-    formElem.submit(function() {
-      var text = formElem.children('textarea').val();
-      eval(text);
-      return false;
-    });
-  });
+	// Initialize components for AI programming
+	var users = ['#userA', '#userB'];
+	_.each(users, function(formId) {
+		var formElem = $(formId + ' .cmd');
+		formElem.submit(function() {
+			var text = formElem.children('textarea').val();
+			eval(text);
+			return false;
+		});
+	});
 });	
 
 

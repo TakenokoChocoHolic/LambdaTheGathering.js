@@ -4,7 +4,7 @@ var Game = {};
     root.state = null;
     root.depth = 0;
 
-    var args_to_array = function (args) {
+    var args2array = function (args) {
         var len, array, i;
 
         len = args.length;
@@ -14,26 +14,26 @@ var Game = {};
         return array;
     };
 
-    var make_curry = function (func) {
-        var required_length = func.length;
-        var curried_func = function () {
+    var makeCurry = function (func) {
+        var requiredLength = func.length;
+        var curriedFunc = function () {
             var ret;
-            var args = args_to_array(arguments);
+            var args = args2array(arguments);
 
-            if (args.length >= required_length) {
-                ret = func.apply(null, args.slice(0, required_length));
+            if (args.length >= requiredLength) {
+                ret = func.apply(null, args.slice(0, requiredLength));
                 if (typeof ret === 'function') {
-                    ret = make_curry(ret).apply(null, args.slice(required_length));
+                    ret = makeCurry(ret).apply(null, args.slice(requiredLength));
                 }
             } else {
                 ret = function () {
-                    var adds = args_to_array(arguments);
-                    return curried_func.apply(null, args.concat(adds));
+                    var adds = args2array(arguments);
+                    return curriedFunc.apply(null, args.concat(adds));
                 };
             }
             return ret;
         };
-        return curried_func;
+        return curriedFunc;
     };
 
     var wrapper = function (func) {
@@ -42,7 +42,7 @@ var Game = {};
                 throw 'number of function applications exceeds 1000';
             }
             root.depth++;
-            return make_curry(func).apply(null, arguments);
+            return makeCurry(func).apply(null, arguments);
         };
     };
 
@@ -54,13 +54,13 @@ var Game = {};
         return root.state.player[1 - root.state.turn % 2];
     };
 
-    var validate_number = function (i) {
+    var validateNumber = function (i) {
         if (typeof i !== 'number') {
             throw 'number is expected, but get ' + i;
         }
     };
 
-    var validate_slot_number = function (i) {
+    var validateSlotNumber = function (i) {
         if (typeof i !== 'number' || i < 0 || 255 < i) {
             throw 'invalid slot number ' + i;
         }
@@ -71,7 +71,7 @@ var Game = {};
     };
 
     var succ = function (n) {
-        validate_number(n);
+        validateNumber(n);
 
         if (n < 65535) {
             return n + 1;
@@ -84,7 +84,7 @@ var Game = {};
     };
 
     var dbl = function (n) {
-        validate_number(n);
+        validateNumber(n);
 
         if (n < 32768) {
             return n * 2;
@@ -94,7 +94,7 @@ var Game = {};
     };
 
     var get = function (i) {
-        validate_slot_number(i);
+        validateSlotNumber(i);
 
         var slot = proponent().slot[i];
         return slot.value;
@@ -117,7 +117,7 @@ var Game = {};
     };
 
     var inc = function (i) {
-        validate_slot_number(i);
+        validateSlotNumber(i);
 
         var slot = proponent().slot[i];
         if (0 < slot.vitality && slot.vitality < 65535) {
@@ -127,7 +127,7 @@ var Game = {};
     };
 
     var dec = function (i) {
-        validate_slot_number(i);
+        validateSlotNumber(i);
 
         var slot = opponent().slot[255-i];
         if (slot.vitality > 0) {
@@ -137,8 +137,8 @@ var Game = {};
     };
 
     var attack = function (i, j, n) {
-        validate_slot_number(i);
-        validate_slot_number(j);
+        validateSlotNumber(i);
+        validateSlotNumber(j);
 
         proponent().slot[i].vitality    -= n;
         opponent().slot[255-j].vitality -= Math.floor(n * 9 / 10);
@@ -146,8 +146,8 @@ var Game = {};
     };
 
     var help = function (i, j, n) {
-        validate_slot_number(i);
-        validate_slot_number(j);
+        validateSlotNumber(i);
+        validateSlotNumber(j);
 
         var prop = proponent();
         prop.slot[i].vitality -= n;
@@ -156,13 +156,13 @@ var Game = {};
     };
 
     var copy = function (i) {
-        validate_slot_number(i);
+        validateSlotNumber(i);
 
         return opponent().slot[i].value;
     };
 
     var revive = function (i) {
-        validate_slot_number(i);
+        validateSlotNumber(i);
 
         var slot = proponent().slot[i];
         if (slot.vitality <= 0) {
@@ -172,7 +172,7 @@ var Game = {};
     };
 
     var zombie = function (i, x) {
-        validate_slot_number(i);
+        validateSlotNumber(i);
 
         var slot = opponent().slot[i];
         if (slot.vitality <= 0) {
@@ -185,22 +185,61 @@ var Game = {};
         return I;
     };
 
-    var step = function (slot_num, func, dir, state) {
-        root.state = state;
+    var applyCard = function (func, arg) {
+        var ret;
         root.depth = 0;
+        try {
+            ret = func(arg);
+        } catch(e) {
+            console.log(e);
+            ret = I;
+        }
+        return ret;
+    };
+
+    var processZombies = function (state, player) {
+        state.zombieMode = true;
+
+        player.slot.forEach(function (slot) {
+            if (slot.vitality === -1) {
+                applyCard(slot.value, I);
+                slot.value = I;
+            }
+        });
+
+        state.zombieMode = false;
+    };
+
+    var initState = function () {
+        var initPlayer = function () {
+            var slot = [], i;
+            for (i=0; i<256; i++) {
+                slot.push({ "vitality": 10000, "value": I });
+            }
+
+            return { "slot": slot };
+        };
+
+        return { "player": [ initPlayer(), initPlayer() ] };
+    };
+
+    var step = function (slotNum, func, dir, state) {
+        root.state = state;
 
         var t = state.turn % 2,
             proponent = state.player[t],
-            slot = proponent.slot[slot_num];
+            slot = proponent.slot[slotNum];
+
+        processZombies(state, proponent);
 
         if (true) {
-            slot.value = slot.value(func);
+            slot.value = applyCard(slot.value, func);
         } else {
-            slot.value = func(slot.value);
+            slot.value = applyCard(func, slot.value);
         }
     };
 
-    root.zero   = wrapper(zero);
+    root.zero   = 0;
     root.succ   = wrapper(succ);
     root.dbl    = wrapper(dbl);
     root.cI     = wrapper(I);
@@ -216,7 +255,8 @@ var Game = {};
     root.revive = wrapper(revive);
     root.zombie = wrapper(zombie);
 
-    root.step   = wrapper(step);
+    root.step   = step;
+    root.initState = initState();
 
 })(Game);
 
