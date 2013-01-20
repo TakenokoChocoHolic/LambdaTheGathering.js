@@ -53,17 +53,29 @@ $(function(){
 
 	// Create buttons
 	var dirs = ['left', 'right'];
-	var cards = [
-		"zero", "succ", "dbl", // numbers
-		'get', 'put',
-		'S', 'K', 'I',
-		'inc', 'dec', 'attack', 'help', 'copy', 'revive', 'zombie'
-	]
-	function mkCmd(dir, card) {
+	var cards = {
+		"zero":    Game.zero,
+		"succ":    Game.succ,
+		"double":  Game.dbl,
+		'get':     Game.get,
+		'put':     Game.put,
+		'S':       Game.cS,
+		'K':       Game.sK,
+		'I':       Game.sI,
+		'inc':     Game.inc,
+		'dec':     Game.dec,
+		'attack':  Game.attack,
+		'help':    Game.help,
+		'copy':    Game.copy,
+		'revive':  Game.revive,
+		'zombie':  Game.zombie,
+	}
+
+	function mkCmd(dir, cardFunc) {
 		return function() {
 			var slotNum = checkedIndex;
 			if (slotNum !== null) {
-				Game.step(slotNum, card, dir, state);
+				Game.step(slotNum, cardFunc, dir, state);
 				renderBoth();
 			} else {
 				alert('!!! Select slot !!!');
@@ -71,16 +83,15 @@ $(function(){
 		};
 	};
 	parent = $('#buttons');
-	for (var i = 0; i < cards.length; i++) {
-		var card = cards[i];
-		var item = $('<li />').text(card);
+	_.each(cards, function(func, name){
+		var item = $('<li />').text(name);
 		for (var j = 0; j < dirs.length; j++) {
 			var dir = dirs[j];
-			var btn = $('<button />').text(dir).click(mkCmd(dir, card));
+			var btn = $('<button />').text(dir).click(mkCmd(dir, func));
 			item.append(btn);
 		}
 		parent.append(item);
-	}
+	});
 
 	// Initialize components for AI programming
 	var users = ['#userA', '#userB'];
