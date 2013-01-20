@@ -26,6 +26,11 @@ describe("Game", function () {
             Game.cK(Game.zero)(Game.zero);
             expect(Game.depth).toEqual(2);
         });
+
+        it("should be increased by 4 when K(K)(0)(0)(0) is evaluated", function () {
+            Game.cK(Game.cK)(Game.zero)(Game.zero)(Game.zero);
+            expect(Game.depth).toEqual(4);
+        });
     });
 
     describe("#zero", function () {

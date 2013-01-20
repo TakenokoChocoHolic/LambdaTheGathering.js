@@ -5,7 +5,7 @@ $(function(){
 
 	var renderSlots = function(parentElem, slotsData, callback) {
 		var checkedClass = 'checked-slot';
-		parentElem
+		parentElem.empty();
 		_.each(slotsData, function(slot, index){
 			var slotElem = $('<div class="slot" />');
 			// vitality
@@ -16,14 +16,14 @@ $(function(){
 				'rgb(' + (255 - v) + ', '+ v + ', 0)'
 			});
 			// value
+			var valueTxt = '?'
 			if (typeof(slot.value) === 'number') {
-				slotElem.text(slot.value);
+				valueTxt = slot.value.toString();
 			} else if (slot.value == Game.cI) {
-				slotElem.text('I');
-			} else {
-				alert(Game.cI);
-				slotElem.text('?');
+				valueTxt = 'I';
 			}
+			slotElem.text(valueTxt);
+			slotElem.attr('title', 'value: ' + valueTxt + ', vitality: ' + slot.vitality);
 			if (callback) {
 				slotElem.click(function(){
 					var checkedElems = $('.' + checkedClass);
@@ -47,23 +47,35 @@ $(function(){
 	var checkedIndex = null;
 	var renderBoth = function() {
 		renderSlots($('#userA .slots'), state.player[0].slot, function(ix){ checkedIndex = ix; });
-		renderSlots($('#userB .slots'), state.player[1].slot, null);
+		renderSlots($('#userB .slots'), state.player[1].slot, function(ix){ checkedIndex = ix; });
 	}
 	renderBoth();
 
 	// Create buttons
-	var dirs = ['left', 'right'];
-	var cards = [
-		"zero", "succ", "dbl", // numbers
-		'get', 'put',
-		'S', 'K', 'I',
-		'inc', 'dec', 'attack', 'help', 'copy', 'revive', 'zombie'
-	]
-	function mkCmd(dir, card) {
+	var dirs = ['card(slot)', 'slot(card)'];
+	var cards = {
+		"zero":    Game.zero,
+		"succ":    Game.succ,
+		"double":  Game.dbl,
+		'get':     Game.get,
+		'put':     Game.put,
+		'S':       Game.cS,
+		'K':       Game.sK,
+		'I':       Game.sI,
+		'inc':     Game.inc,
+		'dec':     Game.dec,
+		'attack':  Game.attack,
+		'help':    Game.help,
+		'copy':    Game.copy,
+		'revive':  Game.revive,
+		'zombie':  Game.zombie,
+	}
+
+	function mkCmd(dir, cardFunc) {
 		return function() {
 			var slotNum = checkedIndex;
 			if (slotNum !== null) {
-				Game.step(slotNum, card, dir, state);
+				Game.step(slotNum, cardFunc, dir === dirs[0], state);
 				renderBoth();
 			} else {
 				alert('!!! Select slot !!!');
@@ -71,16 +83,15 @@ $(function(){
 		};
 	};
 	parent = $('#buttons');
-	for (var i = 0; i < cards.length; i++) {
-		var card = cards[i];
-		var item = $('<li />').text(card);
+	_.each(cards, function(func, name){
+		var item = $('<li />').text(name);
 		for (var j = 0; j < dirs.length; j++) {
 			var dir = dirs[j];
-			var btn = $('<button />').text(dir).click(mkCmd(dir, card));
+			var btn = $('<button />').text(dir).click(mkCmd(dir, func));
 			item.append(btn);
 		}
 		parent.append(item);
-	}
+	});
 
 	// Initialize components for AI programming
 	var users = ['#userA', '#userB'];
