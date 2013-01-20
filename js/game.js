@@ -22,8 +22,10 @@ var Game = {};
 
             if (args.length >= requiredLength) {
                 ret = func.apply(null, args.slice(0, requiredLength));
+                root.depth += requiredLength;
                 if (typeof ret === 'function') {
                     ret = makeCurry(ret).apply(null, args.slice(requiredLength));
+                    root.depth += args.length - requiredLength;
                 }
             } else {
                 ret = function () {
@@ -41,7 +43,6 @@ var Game = {};
             if (root.depth >= 1000) {
                 throw 'number of function applications exceeds 1000';
             }
-            root.depth++;
             return makeCurry(func).apply(null, arguments);
         };
     };
