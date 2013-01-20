@@ -21,11 +21,6 @@ describe("Game", function () {
             expect(Game.depth).toEqual(0);
         });
 
-        it("should increase by 1 when 'zero' has been called", function () {
-            Game.zero();
-            expect(Game.depth).toEqual(1);
-        });
-
     });
 
     describe("#zero", function () {
@@ -35,7 +30,7 @@ describe("Game", function () {
         });
 
         it("should be equal to 0", function () {
-            expect(Game.zero()).toEqual(0);
+            expect(Game.zero).toEqual(0);
         });
 
     });
@@ -43,7 +38,7 @@ describe("Game", function () {
     describe("succ(succ(zero))", function () {
 
         it("should be equal to 2", function () {
-            expect(Game.succ(Game.succ(Game.zero()))).toEqual(2);
+            expect(Game.succ(Game.succ(Game.zero))).toEqual(2);
         });
 
     });
