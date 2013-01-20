@@ -5,7 +5,7 @@ $(function(){
 
 	var renderSlots = function(parentElem, slotsData, callback) {
 		var checkedClass = 'checked-slot';
-		parentElem
+		parentElem.empty();
 		_.each(slotsData, function(slot, index){
 			var slotElem = $('<div class="slot" />');
 			// vitality
