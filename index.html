@@ -1,6 +1,12 @@
 <!doctyep html>
 <style>
-	#slots {
+	#buttons {
+		float: right;
+	}
+    .clear {
+        clear: both;
+    }
+	.slots {
 		float: left;
 		width: 320px;
 	}
@@ -14,29 +20,46 @@
 	.slot.checked-slot {
 		background-color: #fdd;
 	}
-	#buttons {
-		float: left;
-	}
-    #cmd {
-        clear: both;
-    }
-    #cmd>textarea {
+    .cmd {
+        display: block;
+        float:left;
         width: 300px;
-        height:200px;
+    }
+    .cmd>textarea {
+        display: block;
+        margin: 10px;
+        width: 280px;
+        height: 200px;
+    }
+    .cmd > button {
+        display: block;
+        margin-left: auto;
     }
 </style>
 <title>Lambda the Gathering</title>
 
-<div id="slots"></div>
 <ul id="buttons"></ul>
-<form id="cmd">
-    <textarea name="script"></textarea>
-    <button>Run</button>
-</form>
+<div id="userA" class="user">
+    <div class="slots"></div>
+    <form class="cmd">
+        <textarea name="script"></textarea>
+        <button>Run</button>
+    </form>
+    <br class="clear">
+</div>
+<div id="userB" class="user">
+    <div class="slots"></div>
+    <form class="cmd">
+        <textarea name="script"></textarea>
+        <button>Run</button>
+    </form>
+    <br class="clear">
+</div>
 <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js"></script>
 <script src="game.js"></script>
 <script>
+/*
 	// ---------------------------------- Dummy
 	var Game = {};
 	Game.NUM_SLOT = 256;
@@ -56,14 +79,13 @@
 
 	Game.step  = function(slot_num, card, dir, state){ alert(JSON.stringify(arguments)); return state;}
 	// ---------------------------------- Dummy
-
+*/
 $(function(){
 	'use strict';
 
-	var state = new Game.State();
+	var state = Game.initState();
 
 	// Init Slot
-	var parent = $('#slots');
 	var checkecId = null;
 	var checkedClass = 'checked-slot';
 	function check(jElem) {
@@ -78,12 +100,14 @@ $(function(){
 		}
 	}
 	var dataNumberAttribute = 'slot-number';
-	for (var i = 0; i < Game.NUM_SLOT; i++) {
-		var slot = $('<div class="slot" />');
-		slot.data(dataNumberAttribute, i);
-		slot.click(check(slot));
-		parent.append(slot);
-	}
+	_.each([$('#userA .slots'), $('#userB .slots')], function (parent) {
+	    for (var i = 0; i < Game.NUM_SLOT; i++) {
+	        var slot = $('<div class="slot" />');
+	        slot.data(dataNumberAttribute, i);
+	        slot.click(check(slot));
+	        parent.append(slot);
+	    }
+	});
 
 	// Create buttons
 	var dirs = ['left', 'right'];
@@ -95,9 +119,9 @@ $(function(){
 	]
 	function mkCmd(dir, card) {
 		return function() {
-			var slot_num = parseInt($('.' + checkedClass).first().data(dataNumberAttribute));
-			if (slot_num) {
-				state = Game.step(slot_num, card, dir, state);
+			var slotNum = parseInt($('.' + checkedClass).first().data(dataNumberAttribute));
+			if (slotNum) {
+				state = Game.step(slotNum, card, dir, state);
 				// update view
 				$('.slot').each(function () {
 					var idx = $(this).data(dataNumberAttribute);
@@ -120,5 +144,18 @@ $(function(){
 		}
 		parent.append(item);
 	}
+
+	// Initialize components for AI programming
+	var users = ['#userA', '#userB'];
+	_.each(users, function(formId) {
+		var formElem = $(formId + ' .cmd');
+		formElem.submit(function() {
+			var text = formElem.children('textarea').val();
+			eval(text);
+			return false;
+		});
+	});
 });	
+
+
 </script>
