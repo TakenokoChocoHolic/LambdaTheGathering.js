@@ -147,7 +147,6 @@ var Game = {};
     });
 
     var help = wrapper(function (i, j, n) {
-        console.log("help: " + i + ", " + j + ", " + n);
         validateSlotNumber(i);
         validateSlotNumber(j);
 
