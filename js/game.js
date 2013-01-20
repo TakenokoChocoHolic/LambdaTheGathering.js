@@ -239,7 +239,7 @@ var Game = {};
         }
     };
 
-    root.zero   = wrapper(zero);
+    root.zero   = 0;
     root.succ   = wrapper(succ);
     root.dbl    = wrapper(dbl);
     root.cI     = wrapper(I);
