@@ -16,14 +16,14 @@ $(function(){
 				'rgb(' + (255 - v) + ', '+ v + ', 0)'
 			});
 			// value
+			var valueTxt = '?'
 			if (typeof(slot.value) === 'number') {
-				slotElem.text(slot.value);
+				valueTxt = slot.value.toString();
 			} else if (slot.value == Game.cI) {
-				slotElem.text('I');
-			} else {
-				alert(Game.cI);
-				slotElem.text('?');
+				valueTxt = 'I';
 			}
+			slotElem.text(valueTxt);
+			slotElem.attr('title', 'value: ' + valueTxt + ', vitality: ' + slot.vitality);
 			if (callback) {
 				slotElem.click(function(){
 					var checkedElems = $('.' + checkedClass);
