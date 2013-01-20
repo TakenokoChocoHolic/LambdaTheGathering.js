@@ -114,7 +114,7 @@ var Game = {};
     });
 
     var S = wrapper(function (f, g, x) {
-        return f(x)(f(x));
+        return f(x)(g(x));
     });
 
     var inc = wrapper(function (i) {
