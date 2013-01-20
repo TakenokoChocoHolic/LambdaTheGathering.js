@@ -1,161 +1,25 @@
 <!doctyep html>
-<style>
-	#buttons {
-		float: right;
-	}
-    .clear {
-        clear: both;
-    }
-	.slots {
-		float: left;
-		width: 320px;
-	}
-	.slot {
-		display: inline-block;
-		background-color: #dfd;
-		border: solid 1px black;
-		width: 18px;
-		height: 18px;
-	}
-	.slot.checked-slot {
-		background-color: #fdd;
-	}
-    .cmd {
-        display: block;
-        float:left;
-        width: 300px;
-    }
-    .cmd>textarea {
-        display: block;
-        margin: 10px;
-        width: 280px;
-        height: 200px;
-    }
-    .cmd > button {
-        display: block;
-        margin-left: auto;
-    }
-</style>
+<link rel='stylesheet' href="style/index.css">
 <title>Lambda the Gathering</title>
 
 <ul id="buttons"></ul>
 <div id="userA" class="user">
-    <div class="slots"></div>
-    <form class="cmd">
-        <textarea name="script"></textarea>
-        <button>Run</button>
-    </form>
-    <br class="clear">
+	<div class="slots"></div>
+	<form class="cmd">
+		<textarea name="script"></textarea>
+		<button>Run</button>
+	</form>
+	<br class="clear">
 </div>
 <div id="userB" class="user">
-    <div class="slots"></div>
-    <form class="cmd">
-        <textarea name="script"></textarea>
-        <button>Run</button>
-    </form>
-    <br class="clear">
+	<div class="slots"></div>
+	<form class="cmd">
+		<textarea name="script"></textarea>
+		<button>Run</button>
+	</form>
+	<br class="clear">
 </div>
 <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js"></script>
-<script src="game.js"></script>
-<script>
-/*
-	// ---------------------------------- Dummy
-	var Game = {};
-	Game.NUM_SLOT = 256;
-	Game.Id = function(x) { return x; };
-	Game.State = function(){
-		this.player = [];
-		for (var i = 0; i < 2; i++) {
-			var slot = [];
-			for (var i = 0; i < Game.NUM_SLOT; i++) {
-				slot.push({ vitality: 255, value : Game.Id });
-			}
-			var player = {'slot' : slot};
-			this.player.push(player);
-		}
-		this.turn = 1;
-	}
-
-	Game.step  = function(slot_num, card, dir, state){ alert(JSON.stringify(arguments)); return state;}
-	// ---------------------------------- Dummy
-*/
-$(function(){
-	'use strict';
-
-	var state = Game.initState();
-
-	// Init Slot
-	var checkecId = null;
-	var checkedClass = 'checked-slot';
-	function check(jElem) {
-		var num = parseInt(jElem.data('slot-number'));
-		return function() {
-			if (jElem.hasClass(checkedClass)) {
-				jElem.removeClass(checkedClass);
-			} else {
-				$('.slot').removeClass(checkedClass);
-				jElem.addClass(checkedClass);
-			}
-		}
-	}
-	var dataNumberAttribute = 'slot-number';
-	_.each([$('#userA .slots'), $('#userB .slots')], function (parent) {
-	    for (var i = 0; i < Game.NUM_SLOT; i++) {
-	        var slot = $('<div class="slot" />');
-	        slot.data(dataNumberAttribute, i);
-	        slot.click(check(slot));
-	        parent.append(slot);
-	    }
-	});
-
-	// Create buttons
-	var dirs = ['left', 'right'];
-	var cards = [
-		"zero", "succ", "dbl", // numbers
-		'get', 'put',
-		'S', 'K', 'I',
-		'inc', 'dec', 'attack', 'help', 'copy', 'revive', 'zombie'
-	]
-	function mkCmd(dir, card) {
-		return function() {
-			var slotNum = parseInt($('.' + checkedClass).first().data(dataNumberAttribute));
-			if (slotNum) {
-				state = Game.step(slotNum, card, dir, state);
-				// update view
-				$('.slot').each(function () {
-					var idx = $(this).data(dataNumberAttribute);
-					var vit = state.player[0].slot[idx].vitality;
-					$(this).text(vit);
-				});
-			} else {
-				alert('!!! Select slot !!!');
-			}
-		};
-	};
-	parent = $('#buttons');
-	for (var i = 0; i < cards.length; i++) {
-		var card = cards[i];
-		var item = $('<li />').text(card);
-		for (var j = 0; j < dirs.length; j++) {
-			var dir = dirs[j];
-			var btn = $('<button />').text(dir).click(mkCmd(dir, card));
-			item.append(btn);
-		}
-		parent.append(item);
-	}
-
-	// Initialize components for AI programming
-	var users = ['#userA', '#userB'];
-	_.each(users, function(formId) {
-		var formElem = $(formId + ' .cmd');
-		formElem.submit(function() {
-			var text = formElem.children('textarea').val();
-			eval(text);
-			return false;
-		});
-	});
-});	
-
-
-</script>
+<script src="js/game.js"></script>
+<script src="js/index.js"></script>
