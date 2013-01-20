@@ -16,6 +16,16 @@ describe("Game", function () {
         it("is 0 when did nothing", function () {
             expect(Game.depth).toEqual(0);
         });
+
+        it("should be increased by 2 when I(I(0)) is evaluated", function () {
+            Game.cI(Game.cI(Game.zero));
+            expect(Game.depth).toEqual(2);
+        });
+
+        it("should be increased by 2 when K(0)(0) is evaluated", function () {
+            Game.cK(Game.zero)(Game.zero);
+            expect(Game.depth).toEqual(2);
+        });
     });
 
     describe("#zero", function () {
