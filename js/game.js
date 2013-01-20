@@ -220,10 +220,10 @@ var Game = {};
             return { "slot": slot };
         };
 
-        return { "player": [ initPlayer(), initPlayer() ] };
+        return { "turn": 0, "player": [ initPlayer(), initPlayer() ] };
     };
 
-    var step = function (slotNum, func, dir, state) {
+    var step = function (slotNum, card, cardToSlot, state) {
         root.state = state;
 
         var t = state.turn % 2,
@@ -232,11 +232,13 @@ var Game = {};
 
         processZombies(state, proponent);
 
-        if (true) {
-            slot.value = applyCard(slot.value, func);
+        if (cardToSlot) {
+            slot.value = applyCard(card, slot.value);
         } else {
-            slot.value = applyCard(func, slot.value);
+            slot.value = applyCard(slot.value, card);
         }
+
+        state.turn++;
     };
 
     root.zero   = 0;
@@ -256,7 +258,7 @@ var Game = {};
     root.zombie = wrapper(zombie);
 
     root.step   = step;
-    root.initState = initState();
+    root.initState = initState;
 
 })(Game);
 
