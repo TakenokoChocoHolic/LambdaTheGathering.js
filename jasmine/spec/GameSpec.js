@@ -154,4 +154,13 @@ describe("Game with state", function() {
         });
     });
 
+    describe("when using K", function() {
+        it("should have correct slots", function () {
+            Game.step(0, Game.cK, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.zero, false, state); Game.step(0, Game.cI, false, state);
+            Game.step(0, Game.zero, false, state); Game.step(0, Game.cI, false, state);
+            expect(state.player[0].slot[0]).toEqual({'value': 0, 'vitality': 10000});
+        });
+    });
+
 });

@@ -225,6 +225,7 @@ var Game = {};
     };
 
     var step = function (slotNum, card, cardToSlot, state) {
+        console.log(arguments);
         root.state = state;
 
         var t = state.turn % 2,
