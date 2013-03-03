@@ -1,4 +1,10 @@
+"use strict";
+
 var Game = {};
+if (this !== this['window']) {
+    Game = exports;
+}
+
 (function(root) {
 
     root.state = null;
@@ -261,6 +267,4 @@ var Game = {};
 
     root.step   = step;
     root.initState = initState;
-
 })(Game);
-

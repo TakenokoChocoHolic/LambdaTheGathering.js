@@ -1,5 +1,5 @@
 {
-    "name": "LambdatheGathering.js"
+    "name": "LambdaTheGathering.js"
   , "version": "0.0.1"
   , "dependencies": {
         "underscore": "1.3.x"
@@ -11,7 +11,7 @@
     }
   , "scripts": {
         "start": "make clean all && node server.js"
-      , "test": "make clean all && mocha -t 10000"
+      , "test": "node_modules/jasmine-node/bin/jasmine-node spec"
     }
   , "engines": {
         "node": "0.8.x"
