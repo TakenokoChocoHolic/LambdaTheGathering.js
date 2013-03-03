@@ -1,4 +1,5 @@
 $(function() {
+	"use strict";
 	var state = Game.initState();
 
 	var renderSlots = function(parentElem, slotsData, callback) {
