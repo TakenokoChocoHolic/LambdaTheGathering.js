@@ -2,7 +2,34 @@ var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
-};
+}
+var State = (function () {
+    function State() {
+        player = [
+            new Player(), 
+            new Player()
+        ];
+        turn = 0;
+        zombieMode = false;
+    }
+    return State;
+})();
+var Player = (function () {
+    function Player() {
+        slot = [];
+        for(i = 0; i < 255; i++) {
+            slot.push(new Slot());
+        }
+    }
+    return Player;
+})();
+var Slot = (function () {
+    function Slot() {
+        value = new I();
+        vitality = 10000;
+    }
+    return Slot;
+})();
 var Card = (function () {
     function Card(game) {
         this.game = game;

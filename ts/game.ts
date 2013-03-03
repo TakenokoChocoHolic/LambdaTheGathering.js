@@ -1,21 +1,34 @@
-interface Game {
-    state: State;
-    depth: number;
-}
-
-interface State {
+class State {
     player: Player[];
     turn: number;
     zombieMode: bool;
+
+    constructor () {
+        player = [new Player, new Player];
+        turn = 0;
+        zombieMode = false;
+    }
 }
 
-interface Player {
+class Player {
     slot: Slot[];
+
+    constructor () {
+        slot = [];
+        for (i=0; i<255; i++) {
+            slot.push(new Slot);
+        }
+    }
 }
 
-interface Slot {
+class Slot {
     value: Card;
     vitality: number;
+
+    constructor () {
+        value = new I;
+        vitality = 10000;
+    }
 }
 
 class Card {
