@@ -1,6 +1,4 @@
 $(function(){
-	'use strict';
-
 	var state = Game.initState();
 
 	var renderSlots = function(parentElem, slotsData, callback) {
@@ -93,6 +91,14 @@ $(function(){
 		parent.append(item);
 	});
 
+  function advanceUserA() {
+    alert("A");
+  }
+
+  function advanceUserB() {
+    alert("B");
+  }
+
 	// Initialize components for AI programming
 	var users = ['#userA', '#userB'];
 	_.each(users, function(formId) {
@@ -104,4 +110,12 @@ $(function(){
 			return false;
 		});
 	});
+
+	$('#advance').click(function() {
+    var ret;
+    ret = advanceUserA(_.clone(state));
+    Game.step(ret.slotNum, ret.card, ret.cardToSlot, state);
+    ret = advanceUserB(_.clone(state));
+    Game.step(ret.slotNum, ret.card, ret.cardToSlot, state);
+  });
 });
