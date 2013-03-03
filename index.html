@@ -3,11 +3,13 @@
 <title>Lambda the Gathering</title>
 
 <ul id="buttons"></ul>
+<div>
+	<button id="advance">Advance a turn</button>
+</div>
 <div id="userA" class="user">
 	<div class="slots"></div>
 	<form class="cmd">
 		<textarea name="script"></textarea>
-		<button>Run</button>
 	</form>
 	<br class="clear">
 </div>
@@ -15,12 +17,16 @@
 	<div class="slots"></div>
 	<form class="cmd">
 		<textarea name="script"></textarea>
-		<button>Run</button>
 	</form>
 	<br class="clear">
 </div>
-<button id="advance">Advance one turn</button>
 <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js"></script>
+<script src="http://epeli.github.com/underscore.string/dist/underscore.string.min.js"></script>
+<script type="text/javascript">
+<!--
+_.mixin(_.str.exports());
+// -->
+</script>
 <script src="js/game.js"></script>
 <script src="js/index.js"></script>
